@@ -43,9 +43,9 @@ helper def: convertProperty(property: String) :Set(String) =
 
 rule node2camp{
 	from
-		n: MMTOSCA!NodeTemplateModelImpl
+		n: MMTOSCA!NodeTemplateModel
 	to 
-		srv: CAMP!Service(
+		srv: MMCAMP!Service(
 			name <- n.name
 		)
 }

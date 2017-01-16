@@ -106,7 +106,7 @@ public class TOSCA2CAMP {
 				
 				TOSCA2CAMP runner = new TOSCA2CAMP();
 				runner.loadModels(launcher.getPlatform().getServiceTemplate("ServiceTemplate"));
-				//runner.doTOSCA2CAMP(new NullProgressMonitor());
+				runner.doTOSCA2CAMP(new NullProgressMonitor());
 				runner.saveModels("/Users/kena/test.xml");
 			
 		} catch (ATLCoreException e) {
@@ -169,7 +169,9 @@ public class TOSCA2CAMP {
 		ModelFactory factory = new EMFModelFactory();
 		IInjector injector = new EMFInjector();
 	 	IReferenceModel mmtoscaMetamodel = factory.newReferenceModel();
+	 	injector.inject(mmtoscaMetamodel, getMetamodelUri("MMTOSCA"));
 		IReferenceModel mmcampMetamodel = factory.newReferenceModel();
+		injector.inject(mmcampMetamodel, getMetamodelUri("MMCAMP"));
 
 		ServiceTemplateTransformer transformer = ServiceTemplateTransformer.of(ePackage, inResource);
 		ServiceTemplateModel  stm = transformer.getServiceTemplate(st);
