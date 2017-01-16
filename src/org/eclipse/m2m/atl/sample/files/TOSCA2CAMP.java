@@ -130,8 +130,6 @@ public class TOSCA2CAMP {
 		inResourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("xml", new XMLResourceFactoryImpl());
 		inResourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
 		
-		
-		
 		URI inFileURI = URI.createFileURI(getMetamodelUri("MMTOSCA"));
 		inResource = inResourceSet.createResource(inFileURI);
 		URI outFileURI = URI.createFileURI(getMetamodelUri("MMCAMP"));
