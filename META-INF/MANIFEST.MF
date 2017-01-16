@@ -13,4 +13,5 @@ Eclipse-LazyStart: true
 Import-Package: kr.ac.hanyang.tosca2camp,
  kr.ac.hanyang.tosca2camp.rest.model,
  kr.ac.hanyang.tosca2camp.rest.model.impl,
- kr.ac.hanyang.tosca2camp.rest.resources
+ kr.ac.hanyang.tosca2camp.rest.resources,
+ kr.ac.hanyang.tosca2camp.templates

@@ -43,7 +43,7 @@ helper def: convertProperty(property: String) :Set(String) =
 
 rule node2camp{
 	from
-		n: MMTOSCA!NodeTemplateModel
+		n: MMTOSCA!NodeTemplateModelImpl
 	to 
 		srv: CAMP!Service(
 			name <- n.name

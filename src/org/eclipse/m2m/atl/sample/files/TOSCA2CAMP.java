@@ -51,10 +51,13 @@ import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher;
 
 import kr.ac.hanyang.tosca2camp.Tosca2CampLauncher;
 import kr.ac.hanyang.tosca2camp.Tosca2CampPlatform;
+import kr.ac.hanyang.tosca2camp.rest.model.ModelPackage;
 //import kr.ac.hanyang.tosca2camp.rest.model.ModelFactory;
 import kr.ac.hanyang.tosca2camp.rest.model.ServiceTemplateModel;
 import kr.ac.hanyang.tosca2camp.rest.model.impl.ModelFactoryImpl;
-import kr.ac.hanyang.tosca2camp.rest.resources.ServiceTemplateResource;
+import kr.ac.hanyang.tosca2camp.rest.resources.ServiceTemplateTransformer;
+import kr.ac.hanyang.tosca2camp.templates.ServiceTemplate;
+
 
 /**
  * Entry point of the 'TOSCA2CAMP' transformation module.
@@ -78,48 +81,34 @@ public class TOSCA2CAMP {
 	 * @generated
 	 */
 	protected IModel outModel;	
-		
+	
+	protected ResourceSet inResourceSet;
+	protected ResourceSet outResourceSet;
+	
+	protected Resource inResource;
+	protected Resource outResource;
+	protected ModelPackage ePackage;
+	
 	/**
 	 * The main method.
 	 * 
 	 * @param args
 	 *            are the arguments
-	 * @generated
+	 * 
 	 */
 	public static void main(String[] args) {
 		try {
-		//	if (args.length < 2) {
-		//		System.out.println("Arguments not valid : {IN_model_path, OUT_model_path}.");
-		//	} else {
-			
-			
-			
-			Tosca2CampLauncher launcher = Tosca2CampLauncher.of()
-															.platform(Tosca2CampPlatform.newPlatform())
-															.serviceTemplate("WebappExample.yml")
-															.createTemplates(true)
-															.launchPlatform();
-															
-			
-			//Tosca2CampPlatform toscaPlatform = launcher.getPlatform();
-			
-			//toscaPlatform.createServiceTemplate("WebappExample.yml");
-			
-			//ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			//XMLEncoder e = new XMLEncoder(baos);
-			//e.writeObject(ServiceTemplateResource.getServiceTemplate(launcher.getPlatform().getServiceTemplate("ServiceTemplate")));
-			//e.close();
-			//ObjectOutputStream oos = new ObjectOutputStream(baos);
-			//oos.writeObject(ServiceTemplateResource.getServiceTemplate(launcher.getPlatform().getServiceTemplate("ServiceTemplate")));
-			//oos.close();
-			//System.out.println(baos.toString( "UTF-8"));
-			//InputStream is = new ByteArrayInputStream(baos.toByteArray());
-			
+				Tosca2CampLauncher launcher = Tosca2CampLauncher.of()
+						.platform(Tosca2CampPlatform.newPlatform())
+						.serviceTemplate("WebappExample.yml")
+						.createTemplates(true)
+						.launchPlatform();
+				
 				TOSCA2CAMP runner = new TOSCA2CAMP();
-				runner.loadModel(ServiceTemplateResource.getServiceTemplate(launcher.getPlatform().getServiceTemplate("ServiceTemplate")));
+				runner.loadModels(launcher.getPlatform().getServiceTemplate("ServiceTemplate"));
 				//runner.doTOSCA2CAMP(new NullProgressMonitor());
-				runner.saveModels("C:\\Users\\kenax\\test.ecore");
-			//}
+				runner.saveModels("/Users/kena/test.xml");
+			
 		} catch (ATLCoreException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -132,14 +121,27 @@ public class TOSCA2CAMP {
 	/**
 	 * Constructor.
 	 *
-	 * @generated
+	 * 
 	 */
 	public TOSCA2CAMP() throws IOException {
 		properties = new Properties();
 		properties.load(getFileURL("TOSCA2CAMP.properties").openStream());
-		//Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("xml", new XMLResourceFactoryImpl());
-		//Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
+		inResourceSet = new ResourceSetImpl();
+		inResourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("xml", new XMLResourceFactoryImpl());
+		inResourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("ecore", new EcoreResourceFactoryImpl());
+		
+		
+		
+		URI inFileURI = URI.createFileURI(getMetamodelUri("MMTOSCA"));
+		inResource = inResourceSet.createResource(inFileURI);
+		URI outFileURI = URI.createFileURI(getMetamodelUri("MMCAMP"));
+		outResource = inResourceSet.createResource(outFileURI);
+		
+		ePackage = ModelPackage.eINSTANCE;
+		inResource.getContents().add(ePackage);
 	}
+	
+	
 	
 	/**
 	 * Load the input and input/output models, initialize output models.
@@ -149,38 +151,37 @@ public class TOSCA2CAMP {
 	 * @throws ATLCoreException
 	 *             if a problem occurs while loading models
 	 *
-	 * @generated
+	 * 
 	 */
-//	public void loadModels(String inModelPath) throws ATLCoreException {
-//		ModelFactory factory = new EMFModelFactory();
-//		IInjector injector = new EMFInjector();
-//	 	IReferenceModel mmcampMetamodel = factory.newReferenceModel();
-//		injector.inject(mmcampMetamodel, getMetamodelUri("MMCAMP"));
-//	 	IReferenceModel mmtoscaMetamodel = factory.newReferenceModel();
-//		injector.inject(mmtoscaMetamodel, getMetamodelUri("MMTOSCA"));
-//		this.inModel = factory.newModel(mmtoscaMetamodel);
-//		injector.inject(inModel, inModelPath);
-//		this.outModel = factory.newModel(mmcampMetamodel);
-//	}
-	
-	public void loadModel(Object obj) throws ATLCoreException {
-		ResourceSet resourceSet= new ResourceSetImpl();
-		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("xml", new XMLResourceFactoryImpl());
-		URI fileURI = URI.createFileURI("C:\\Users\\kenax\\test.xml");
-		Resource resource = resourceSet.createResource(fileURI);
-		//resource.getContents().add((ServiceTemplateModel)obj);
-		resource.getContents().add(kr.ac.hanyang.tosca2camp.rest.model.ModelFactory.eINSTANCE.createServiceTemplateModel());
-	
+	public void loadModels(String inModelPath) throws ATLCoreException {
 		ModelFactory factory = new EMFModelFactory();
-		IInjector injector = new EMFInjector();		
+		IInjector injector = new EMFInjector();
 	 	IReferenceModel mmcampMetamodel = factory.newReferenceModel();
-	 	IModel model = factory.newModel(mmcampMetamodel);
-	 	
-	 	//ResourceSet resourceSet = ((EMFModelFactory)mmcampMetamodel.getModelFactory()).getResourceSet();
-	 	
-	 	((EMFInjector)injector).inject(model, resource);
+		injector.inject(mmcampMetamodel, getMetamodelUri("MMCAMP"));
+	 	IReferenceModel mmtoscaMetamodel = factory.newReferenceModel();
+		injector.inject(mmtoscaMetamodel, getMetamodelUri("MMTOSCA"));
+		this.inModel = factory.newModel(mmtoscaMetamodel);
+		injector.inject(inModel, inModelPath);
+		this.outModel = factory.newModel(mmcampMetamodel);
+	}
+	
+	
+
+	public void loadModels(ServiceTemplate st) throws ATLCoreException {
+		ModelFactory factory = new EMFModelFactory();
+		IInjector injector = new EMFInjector();
+	 	IReferenceModel mmtoscaMetamodel = factory.newReferenceModel();
+		IReferenceModel mmcampMetamodel = factory.newReferenceModel();
+
+		ServiceTemplateTransformer transformer = ServiceTemplateTransformer.of(ePackage, inResource);
+		ServiceTemplateModel  stm = transformer.getServiceTemplate(st);
+		inResource.getContents().add(stm);
 		
-		this.outModel= model;
+	 	inModel = factory.newModel(mmtoscaMetamodel);
+	 	((EMFInjector)injector).inject(inModel, inResource);
+	 	
+	 	outModel = factory.newModel(mmcampMetamodel);
+		
 	}
 	
 	/**

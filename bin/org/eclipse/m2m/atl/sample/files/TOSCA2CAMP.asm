@@ -288,7 +288,7 @@
 		<constant value="24:2-40:91"/>
 		<constant value="property"/>
 		<constant value="__matchnode2camp"/>
-		<constant value="NodeTemplateModel"/>
+		<constant value="NodeTemplateModelImpl"/>
 		<constant value="MMTOSCA"/>
 		<constant value="IN"/>
 		<constant value="MMOF!Classifier;.allInstancesFrom(S):QJ"/>
@@ -312,6 +312,7 @@
 		<constant value="49:4-49:18"/>
 		<constant value="link"/>
 		<constant value="__matchchars"/>
+		<constant value="NodeTemplateModel"/>
 		<constant value="chr"/>
 		<constant value="ServiceCharacteristic"/>
 		<constant value="MMCAMP"/>
@@ -1031,7 +1032,7 @@
 		<parameters>
 		</parameters>
 		<code>
-			<push arg="287"/>
+			<push arg="311"/>
 			<push arg="288"/>
 			<findme/>
 			<push arg="289"/>
@@ -1051,9 +1052,9 @@
 			<load arg="19"/>
 			<pcall arg="294"/>
 			<dup/>
-			<push arg="311"/>
 			<push arg="312"/>
 			<push arg="313"/>
+			<push arg="314"/>
 			<new/>
 			<pcall arg="298"/>
 			<pusht/>
@@ -1061,14 +1062,14 @@
 			<enditerate/>
 		</code>
 		<linenumbertable>
-			<lne id="314" begin="19" end="24"/>
+			<lne id="315" begin="19" end="24"/>
 		</linenumbertable>
 		<localvariabletable>
 			<lve slot="1" name="293" begin="6" end="26"/>
 			<lve slot="0" name="17" begin="0" end="27"/>
 		</localvariabletable>
 	</operation>
-	<operation name="315">
+	<operation name="316">
 		<context type="6"/>
 		<parameters>
 			<parameter name="19" type="302"/>
@@ -1079,7 +1080,7 @@
 			<call arg="303"/>
 			<store arg="29"/>
 			<load arg="19"/>
-			<push arg="311"/>
+			<push arg="312"/>
 			<call arg="304"/>
 			<store arg="305"/>
 			<load arg="305"/>
@@ -1088,23 +1089,23 @@
 			<getasm/>
 			<load arg="29"/>
 			<get arg="168"/>
-			<call arg="316"/>
 			<call arg="317"/>
+			<call arg="318"/>
 			<call arg="30"/>
-			<set arg="318"/>
+			<set arg="319"/>
 			<pop/>
 		</code>
 		<linenumbertable>
-			<lne id="319" begin="11" end="11"/>
-			<lne id="320" begin="12" end="12"/>
-			<lne id="321" begin="12" end="13"/>
-			<lne id="322" begin="11" end="14"/>
-			<lne id="323" begin="11" end="15"/>
-			<lne id="324" begin="9" end="17"/>
-			<lne id="314" begin="8" end="18"/>
+			<lne id="320" begin="11" end="11"/>
+			<lne id="321" begin="12" end="12"/>
+			<lne id="322" begin="12" end="13"/>
+			<lne id="323" begin="11" end="14"/>
+			<lne id="324" begin="11" end="15"/>
+			<lne id="325" begin="9" end="17"/>
+			<lne id="315" begin="8" end="18"/>
 		</linenumbertable>
 		<localvariabletable>
-			<lve slot="3" name="311" begin="7" end="18"/>
+			<lve slot="3" name="312" begin="7" end="18"/>
 			<lve slot="2" name="293" begin="3" end="18"/>
 			<lve slot="0" name="17" begin="0" end="18"/>
 			<lve slot="1" name="309" begin="0" end="18"/>
