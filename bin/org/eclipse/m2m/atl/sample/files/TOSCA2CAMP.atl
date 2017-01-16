@@ -50,11 +50,11 @@ rule node2camp{
 		)
 }
 
-rule chars{
-	from
-		n: MMTOSCA!NodeTemplateModel
-	to
-		chr: MMCAMP!ServiceCharacteristic(
-			characteristicType <- thisModule.convertType(n.type) -> first()	
-		) 
-}
+--rule chars{
+--	from
+--		n: MMTOSCA!NodeTemplateModel
+--	to
+--		chr: MMCAMP!ServiceCharacteristic(
+--			characteristicType <- thisModule.convertType(n.type) -> first()	
+--		) 
+--}
