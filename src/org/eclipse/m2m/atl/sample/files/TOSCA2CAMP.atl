@@ -40,13 +40,14 @@ helper def: convertProperty(property: String) :Set(String) =
 	endif endif endif endif endif endif endif endif endif endif endif endif endif endif endif; 
           
 	
-
+-- rule service template
 rule node2camp{
 	from
-		n: MMTOSCA!NodeTemplateModel
+		n: MMTOSCA!ServiceTemplateModel
 	to 
-		srv: MMCAMP!Service(
-			name <- n.name
+		srv: MMCAMP!DeploymentPlan(
+			name <- 'hello',
+			description <- 'desc'
 		)
 }
 

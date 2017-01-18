@@ -285,7 +285,7 @@
 		<constant value="24:2-40:91"/>
 		<constant value="property"/>
 		<constant value="__matchnode2camp"/>
-		<constant value="NodeTemplateModel"/>
+		<constant value="ServiceTemplateModel"/>
 		<constant value="MMTOSCA"/>
 		<constant value="IN"/>
 		<constant value="MMOF!Classifier;.allInstancesFrom(S):QJ"/>
@@ -294,19 +294,23 @@
 		<constant value="n"/>
 		<constant value="NTransientLink;.addSourceElement(SJ):V"/>
 		<constant value="srv"/>
-		<constant value="Service"/>
+		<constant value="DeploymentPlan"/>
 		<constant value="MMCAMP"/>
 		<constant value="NTransientLink;.addTargetElement(SJ):V"/>
 		<constant value="NTransientLinkSet;.addLink2(NTransientLink;B):V"/>
-		<constant value="48:3-50:4"/>
+		<constant value="48:3-51:4"/>
 		<constant value="__applynode2camp"/>
 		<constant value="NTransientLink;"/>
 		<constant value="NTransientLink;.getSourceElement(S):J"/>
 		<constant value="NTransientLink;.getTargetElement(S):J"/>
 		<constant value="3"/>
-		<constant value="49:12-49:13"/>
-		<constant value="49:12-49:18"/>
-		<constant value="49:4-49:18"/>
+		<constant value="hello"/>
+		<constant value="desc"/>
+		<constant value="description"/>
+		<constant value="49:12-49:19"/>
+		<constant value="49:4-49:19"/>
+		<constant value="50:19-50:25"/>
+		<constant value="50:4-50:25"/>
 		<constant value="link"/>
 	</cp>
 	<field name="1" type="2"/>
@@ -976,23 +980,28 @@
 			<load arg="302"/>
 			<dup/>
 			<getasm/>
-			<load arg="29"/>
-			<get arg="38"/>
+			<push arg="303"/>
 			<call arg="30"/>
 			<set arg="38"/>
+			<dup/>
+			<getasm/>
+			<push arg="304"/>
+			<call arg="30"/>
+			<set arg="305"/>
 			<pop/>
 		</code>
 		<linenumbertable>
-			<lne id="303" begin="11" end="11"/>
-			<lne id="304" begin="11" end="12"/>
-			<lne id="305" begin="9" end="14"/>
-			<lne id="297" begin="8" end="15"/>
+			<lne id="306" begin="11" end="11"/>
+			<lne id="307" begin="9" end="13"/>
+			<lne id="308" begin="16" end="16"/>
+			<lne id="309" begin="14" end="18"/>
+			<lne id="297" begin="8" end="19"/>
 		</linenumbertable>
 		<localvariabletable>
-			<lve slot="3" name="292" begin="7" end="15"/>
-			<lve slot="2" name="290" begin="3" end="15"/>
-			<lve slot="0" name="17" begin="0" end="15"/>
-			<lve slot="1" name="306" begin="0" end="15"/>
+			<lve slot="3" name="292" begin="7" end="19"/>
+			<lve slot="2" name="290" begin="3" end="19"/>
+			<lve slot="0" name="17" begin="0" end="19"/>
+			<lve slot="1" name="310" begin="0" end="19"/>
 		</localvariabletable>
 	</operation>
 </asm>

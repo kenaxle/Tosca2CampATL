@@ -19,6 +19,7 @@ import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
@@ -49,7 +50,9 @@ import org.eclipse.m2m.atl.core.emf.EMFModelFactory;
 import org.eclipse.m2m.atl.core.launch.ILauncher;
 import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher;
 
+import kr.ac.hanyang.oCamp.camp.pdp.PdpFactory;
 import kr.ac.hanyang.oCamp.camp.pdp.PdpPackage;
+import kr.ac.hanyang.oCamp.camp.pdp.impl.PdpFactoryImpl;
 import kr.ac.hanyang.tosca2camp.Tosca2CampLauncher;
 import kr.ac.hanyang.tosca2camp.Tosca2CampPlatform;
 import kr.ac.hanyang.tosca2camp.rest.model.ModelPackage;
@@ -153,21 +156,30 @@ public class TOSCA2CAMP {
 	 * @throws ATLCoreException
 	 *             if a problem occurs while loading models
 	 *
-	 * 
+	 * @generated
 	 */
-//	public void loadModels(String inModelPath) throws ATLCoreException {
-//		ModelFactory factory = new EMFModelFactory();
-//		IInjector injector = new EMFInjector();
-//	 	IReferenceModel mmcampMetamodel = factory.newReferenceModel();
-//		injector.inject(mmcampMetamodel, getMetamodelUri("MMCAMP"));
-//	 	IReferenceModel mmtoscaMetamodel = factory.newReferenceModel();
-//		injector.inject(mmtoscaMetamodel, getMetamodelUri("MMTOSCA"));
-//		this.inModel = factory.newModel(mmtoscaMetamodel);
-//		injector.inject(inModel, inModelPath);
-//		this.outModel = factory.newModel(mmcampMetamodel);
-//	}
-	
-	
+	public void loadModels(String inModelPath) throws ATLCoreException {
+		ModelFactory factory = new EMFModelFactory();
+		IInjector injector = new EMFInjector();
+	 	IReferenceModel mmcampMetamodel = factory.newReferenceModel();
+		injector.inject(mmcampMetamodel, getMetamodelUri("MMCAMP"));
+	 	IReferenceModel mmtoscaMetamodel = factory.newReferenceModel();
+		injector.inject(mmtoscaMetamodel, getMetamodelUri("MMTOSCA"));
+		this.inModel = factory.newModel(mmtoscaMetamodel);
+		injector.inject(inModel, inModelPath);
+		this.outModel = factory.newModel(mmcampMetamodel);
+	}
+
+	/**
+	 * Load the input and input/output models, initialize output models.
+	 * 
+	 * @param inModelPath
+	 *            the IN model path
+	 * @throws ATLCoreException
+	 *             if a problem occurs while loading models
+	 *
+	 * 
+	 */	
 
 	public void loadModels(ServiceTemplate st) throws ATLCoreException {
 		ModelFactory factory = new EMFModelFactory();
@@ -180,7 +192,7 @@ public class TOSCA2CAMP {
 		ServiceTemplateTransformer transformer = ServiceTemplateTransformer.of(inPackage, inResource);
 		ServiceTemplateModel  stm = transformer.getServiceTemplate(st);
 		inResource.getContents().add(stm);
-		outResource.getContents().add(outPackage.getEFactoryInstance().create(PdpPackage.Literals.DEPLOYMENT_PLAN));
+		outResource.getContents().add(((PdpFactoryImpl)outPackage.getEFactoryInstance()).createDeploymentPlan(new LinkedHashMap<String, Object>(), new String("")));
 		
 	 	inModel = factory.newModel(mmtoscaMetamodel);
 	 	((EMFInjector)injector).inject(inModel, inResource);
@@ -197,11 +209,12 @@ public class TOSCA2CAMP {
 	 * @throws ATLCoreException
 	 *             if a problem occurs while saving models
 	 *
-	 * @generated
+	 * 
 	 */
 	public void saveModels(String outModelPath) throws ATLCoreException {
 		IExtractor extractor = new EMFExtractor();
-		extractor.extract(outModel, outModelPath);
+		extractor.extract(outModel, outModelPath+"outModel.xml");
+		//extractor.extract(inModel, outModelPath+"inModel.xmi");
 	}
 
 	/**
