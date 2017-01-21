@@ -1,0 +1,41 @@
+-- @path MMCAMP=/oCamp/src/kr/ac/hanyang/oCamp/atl/CAMP.ecore
+-- @path MMTOSCA=/T2C/src/kr/ac/hanyang/tosca2camp/atl/modelgenerator/model.ecore
+
+module T2C;
+create OUT : MMCAMP from IN : MMTOSCA;
+				
+
+rule s_template2d_plan {
+	from
+		s: MMTOSCA!ServiceTemplateModel
+	to
+		dPlan: MMCAMP!DeploymentPlan (
+			name <- 'DeploymentPlan',
+			description <- s.description,
+			services <- s.topologyTemplate.nodeTemplates
+		)		
+}	
+
+rule n_template2service {
+	from
+		s: MMTOSCA!NodeTemplateModel
+	to
+		srv: MMCAMP!Service (
+			name <- s.name,
+			characteristics <- src
+		),
+		src: MMCAMP!ServiceCharacteristic (
+			characteristicType <- s.type,
+			customAttributes <- s.properties
+		)
+}	
+
+rule prop2attr {
+	from
+		p: MMTOSCA!PropertyModel
+	to
+		scr: MMCAMP!StringToEObjectMap(
+			key <- p.name,
+			value <- 'value' 
+		)
+}

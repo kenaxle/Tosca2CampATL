@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<kr.ac.hanyang.tosca2camp.rest.model:ServiceTemplateModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:kr.ac.hanyang.tosca2camp.rest.model="http:///kr/ac/hanyang/tosca2camp/rest/model.ecore" version="tosca_simple_yaml_1_0" description="TOSCA simple profile with server and attached block storage using the normative AttachesTo Relationship Type.">
+  <topologyTemplate>
+    <nodeTemplates name="my_server" type="tosca.nodes.Compute">
+      <capabilities name="host"/>
+      <capabilities name="os"/>
+    </nodeTemplates>
+    <nodeTemplates name="my_storage" type="tosca.nodes.BlockStorage">
+      <properties name="size"/>
+      <properties name="volume_id">
+        <value value="ACED0005740000"/>
+      </properties>
+      <properties name="snapshot_id">
+        <value value="ACED000574001242533038343431322D53746F726167654944"/>
+      </properties>
+    </nodeTemplates>
+  </topologyTemplate>
+</kr.ac.hanyang.tosca2camp.rest.model:ServiceTemplateModel>

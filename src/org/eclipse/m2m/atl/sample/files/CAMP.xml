@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<kr.ac.hanyang.oCamp.camp.pdp:DeploymentPlan xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:kr.ac.hanyang.oCamp.camp.pdp="http:///kr/ac/hanyang/oCamp/camp/pdp.ecore" name="DeploymentPlan" description="TOSCA simple profile with server and attached block storage using the normative AttachesTo Relationship Type.">
+  <services name="my_server">
+    <characteristics characteristicType="tosca.nodes.Compute"/>
+  </services>
+  <services name="my_storage">
+    <characteristics characteristicType="tosca.nodes.BlockStorage">
+      <customAttributes key="size" value="ACED000574000576616C7565"/>
+      <customAttributes key="volume_id" value="ACED000574000576616C7565"/>
+      <customAttributes key="snapshot_id" value="ACED000574000576616C7565"/>
+    </characteristics>
+  </services>
+</kr.ac.hanyang.oCamp.camp.pdp:DeploymentPlan>
