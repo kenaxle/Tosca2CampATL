@@ -1,13 +1,51 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<kr.ac.hanyang.oCamp.camp.pdp:DeploymentPlan xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:kr.ac.hanyang.oCamp.camp.pdp="http:///kr/ac/hanyang/oCamp/camp/pdp.ecore" name="DeploymentPlan" description="TOSCA simple profile with server and attached block storage using the normative AttachesTo Relationship Type.">
-  <services name="my_server">
-    <characteristics characteristicType="tosca.nodes.Compute"/>
-  </services>
-  <services name="my_storage">
-    <characteristics characteristicType="tosca.nodes.BlockStorage">
-      <customAttributes key="size" value="ACED000574000576616C7565"/>
-      <customAttributes key="volume_id" value="ACED000574000576616C7565"/>
-      <customAttributes key="snapshot_id" value="ACED000574000576616C7565"/>
+<kr.ac.hanyang.oCamp.camp.pdp:DeploymentPlan xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:kr.ac.hanyang.oCamp.camp.pdp="http:///kr/ac/hanyang/oCamp/camp/pdp.ecore" name="DeploymentPlan" description="TOSCA simple profile is an attempt at a microservice definition.&#xA;    &#xA;">
+  <artifacts artifactType="kr.ac.hanyang.oCamp.entities.artifacts.War">
+    <content href="wordpress_install.sh"/>
+    <requirements requirementType="kr.ac.hanyang.oCamp.entities.requirements.DeployOn" fulfillment="id: loadbalancer">
+      <customAttributes key="TARGET" value="ACED000574000E6D795F7765625F636F6E74656E74"/>
+    </requirements>
+    <requirements requirementType="kr.ac.hanyang.oCamp.entities.requirements.ConnectTo" fulfillment="id: mysql_dbms">
+      <customAttributes key="TARGET" value="ACED000574000E6D795F7765625F636F6E74656E74"/>
+    </requirements>
+  </artifacts>
+  <artifacts artifactType="kr.ac.hanyang.oCamp.entities.artifacts.Script">
+    <content href="mysql_database_configure.sh"/>
+    <requirements requirementType="kr.ac.hanyang.oCamp.entities.requirements.DeployOn" fulfillment="id: mysql_dbms">
+      <customAttributes key="name" value="ACED00057400086461746162617365"/>
+      <customAttributes key="MYSQL_PORT" value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000CEA"/>
+      <customAttributes key="user" value="ACED000574000475736572"/>
+      <customAttributes key="password" value="ACED000574000870617373776F7264"/>
+    </requirements>
+  </artifacts>
+  <services name="loadbalancer">
+    <characteristics characteristicType="kr.ac.hanyang.oCamp.entities.services.web.WebAppCluster">
+      <customAttributes key="algorithm" value="ACED000574000A726F756E64726F62696E"/>
+      <member name="webserver">
+        <characteristics characteristicType="My_scalable_webserver">
+          <customAttributes key="min_instances" value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000002"/>
+          <customAttributes key="max_instances" value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000005"/>
+        </characteristics>
+      </member>
     </characteristics>
   </services>
+  <services name="mysql_dbms">
+    <characteristics characteristicType="kr.ac.hanyang.oCamp.entities.services.database.mysql.MySQL">
+      <customAttributes key="MYSQL_PASSWORD" value="ACED000574000870617373776F7264"/>
+      <customAttributes key="MYSQL_PORT" value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000CEA"/>
+    </characteristics>
+  </services>
+  <policies policyType="Webservice_scaling_policy">
+    <policyConstraints policyConstraintType="min_instances" value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000002"/>
+    <policyConstraints policyConstraintType="max_instances" value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000005"/>
+    <targets>webserver</targets>
+  </policies>
+  <policies policyType="Webservice_placement_policy">
+    <policyConstraints policyConstraintType="location" value="ACED00057400184157532056697267696E6961202875732D656173742D3129"/>
+    <targets>webserver</targets>
+  </policies>
+  <policies policyType="Data_placement_policy">
+    <policyConstraints policyConstraintType="location" value="ACED00057400197261636B73706163652D636C6F7564736572766572732D756B"/>
+    <targets>mysql_dbms</targets>
+  </policies>
 </kr.ac.hanyang.oCamp.camp.pdp:DeploymentPlan>

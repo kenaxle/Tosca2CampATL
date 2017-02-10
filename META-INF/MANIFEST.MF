@@ -1,12 +1,13 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ATL org.eclipse.m2m.atl.sample Transformation Runtime Plug-in
-Bundle-SymbolicName: org.eclipse.m2m.atl.sample
+Bundle-SymbolicName: T2CATLConverter
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.m2m.atl.sample.Activator
 Bundle-Vendor: Eclipse Modeling Project
-Require-Bundle: org.eclipse.core.runtime, 
- org.eclipse.m2m.atl.engine.emfvm
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.m2m.atl.engine.emfvm,
+ org.eclipse.emf.ecore
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Eclipse-LazyStart: true
