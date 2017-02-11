@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="ASCII"?>
+<kr.ac.hanyang.tosca2camp.rest.model:ServiceTemplateModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:kr.ac.hanyang.tosca2camp.rest.model="http:///kr/ac/hanyang/tosca2camp/rest/model.ecore" version="1.1.tosca_simple_yaml_1" description="TOSCA simple profile is an attempt at a microservice definition.&#xA;    &#xA;">
+  <nodeTypes typeName="My_webapplication" derivedFrom="tosca.nodes.WebApplication"/>
+  <nodeTypes typeName="My_scalable_webserver" derivedFrom="tosca.nodes.WebServer"/>
+  <topologyTemplate>
+    <nodeTemplates name="loadbalancer" type="tosca.nodes.LoadBalancer">
+      <properties name="algorithm">
+        <value value="ACED000574000A726F756E64726F62696E"/>
+      </properties>
+      <requirements node="wordpress" relationship="tosca.relationships.RoutesTo"/>
+      <capabilities name="client"/>
+      <interfaces name="Standard"/>
+    </nodeTemplates>
+    <nodeTemplates name="wordpress" type="My_webapplication">
+      <properties name="context_root">
+        <value value="ACED000574000E6D795F7765625F636F6E74656E74"/>
+      </properties>
+      <requirements node="webserver" relationship="tosca.relationships.HostedOn"/>
+      <requirements node="mysql_database" relationship="tosca.relationships.ConnectsTo"/>
+      <capabilities name="app_endpoint"/>
+      <interfaces name="Standard">
+        <operations implementation="wordpress_install.sh" name="create"/>
+        <operations implementation="wordpress_configure.sh" name="configure">
+          <inputs_assignments name="wp_db_name">
+            <value value="ACED00057400086461746162617365"/>
+          </inputs_assignments>
+          <inputs_assignments name="wp_db_user">
+            <value value="ACED000574000475736572"/>
+          </inputs_assignments>
+          <inputs_assignments name="wp_db_password">
+            <value value="ACED000574000870617373776F7264"/>
+          </inputs_assignments>
+          <inputs_assignments name="wp_db_port">
+            <value value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000CEA"/>
+          </inputs_assignments>
+        </operations>
+      </interfaces>
+    </nodeTemplates>
+    <nodeTemplates name="mysql_database" type="tosca.nodes.Database">
+      <properties name="name">
+        <value value="ACED00057400086461746162617365"/>
+      </properties>
+      <properties name="port">
+        <value value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000CEA"/>
+      </properties>
+      <properties name="user">
+        <value value="ACED000574000475736572"/>
+      </properties>
+      <properties name="password">
+        <value value="ACED000574000870617373776F7264"/>
+      </properties>
+      <requirements node="mysql_dbms" relationship="tosca.relationships.HostedOn"/>
+      <capabilities name="database_endpoint"/>
+      <interfaces name="Standard">
+        <operations implementation="mysql_database_configure.sh" name="configure"/>
+      </interfaces>
+    </nodeTemplates>
+    <nodeTemplates name="mysql_dbms" type="tosca.nodes.DBMS">
+      <properties name="root_password">
+        <value value="ACED000574000870617373776F7264"/>
+      </properties>
+      <properties name="port">
+        <value value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000CEA"/>
+      </properties>
+      <requirements node="server1" relationship="tosca.relationships.HostedOn"/>
+      <interfaces name="Standard">
+        <inputs name="db_root_password">
+          <value value="ACED000574000870617373776F7264"/>
+        </inputs>
+        <operations implementation="mysql_dbms_install.sh" name="create"/>
+        <operations implementation="mysql_dbms_configure.sh" name="configure"/>
+        <operations implementation="mysql_dbms_start.sh" name="start"/>
+      </interfaces>
+    </nodeTemplates>
+    <nodeTemplates name="webserver" type="My_scalable_webserver">
+      <properties name="min_instances">
+        <value value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000002"/>
+      </properties>
+      <properties name="max_instances">
+        <value value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000005"/>
+      </properties>
+      <requirements node="server2" relationship="tosca.relationships.HostedOn"/>
+      <capabilities name="scalable"/>
+      <interfaces name="Standard">
+        <operations implementation="webserver_install.sh" name="create"/>
+        <operations implementation="webserver_start.sh" name="start"/>
+      </interfaces>
+    </nodeTemplates>
+    <nodeTemplates name="server1" type="tosca.nodes.Compute">
+      <capabilities name="host"/>
+      <capabilities name="os"/>
+      <interfaces name="Standard"/>
+    </nodeTemplates>
+    <nodeTemplates name="server2" type="tosca.nodes.Compute">
+      <capabilities name="host"/>
+      <capabilities name="os"/>
+      <interfaces name="Standard"/>
+    </nodeTemplates>
+    <policies type="Webservice_scaling_policy">
+      <properties name="min_instances">
+        <value value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000002"/>
+      </properties>
+      <properties name="max_instances">
+        <value value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000005"/>
+      </properties>
+      <targets>webserver</targets>
+    </policies>
+    <policies type="Webservice_placement_policy">
+      <properties name="location">
+        <value value="ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A657870000000027704000000027400184157532056697267696E6961202875732D656173742D312974001A41575320546F6B796F202861702D6E6F727468656173742D312978"/>
+      </properties>
+      <targets>webserver</targets>
+    </policies>
+    <policies type="Data_placement_policy">
+      <properties name="location">
+        <value value="ACED0005737200136A6176612E7574696C2E41727261794C6973747881D21D99C7619D03000149000473697A657870000000017704000000017400197261636B73706163652D636C6F7564736572766572732D756B78"/>
+      </properties>
+      <targets>mysql_dbms</targets>
+    </policies>
+  </topologyTemplate>
+</kr.ac.hanyang.tosca2camp.rest.model:ServiceTemplateModel>

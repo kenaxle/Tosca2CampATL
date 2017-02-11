@@ -1,0 +1,268 @@
+-- @path MMCAMP=/oCamp/src/kr/ac/hanyang/oCamp/atl/CAMP.ecore
+-- @path MMTOSCA=/T2C/src/kr/ac/hanyang/tosca2camp/atl/modelgenerator/model.ecore
+
+module T2C;
+create OUT : MMCAMP from IN : MMTOSCA;
+
+helper context MMTOSCA!ServiceTemplateModel def: getNodeDefinition(typeName: String): MMTOSCA!NodeDefinitionModel = 
+	self.nodeTypes -> select(e | e.typeName = typeName) -> first();
+
+helper context MMTOSCA!ServiceTemplateModel def: getNodeTemplate(typeName: String): MMTOSCA!NodetemplateModel = 
+	self.topologyTemplate.nodeTemplates -> select(e | e.name = typeName);
+
+helper def: isNormativeNode(node: String): Boolean = 
+	if node = 'tosca.nodes.Root'  
+	or node = 'tosca.nodes.Compute'
+	or node = 'tosca.nodes.SoftwareComponent' 
+	or node = 'tosca.nodes.WebServer'
+	or node = 'tosca.nodes.WebApplication'
+	or node = 'tosca.nodes.DBMS'
+	or node = 'tosca.nodes.Database' 
+	or node = 'tosca.nodes.ObjectStorage'
+	or node = 'tosca.nodes.BlockStorage' 
+	or node = 'tosca.nodes.ContainerRuntime'
+	or node = 'tosca.nodes.LoadBalancer' 
+	or node = 'tosca.nodes.Container.Application' then 
+		true 
+	else
+		false
+	endif;
+	
+helper def: isLowLevelNode(node: String): Boolean = 
+	if node = 'tosca.nodes.Root'  
+	or node = 'tosca.nodes.Compute' then 
+		true
+	else
+		false
+	endif;
+
+helper def: isChildType(type: String): Boolean = 
+	if type = 'tosca.nodes.WebServer' or type = 'kr.ac.hanyang.oCamp.entities.services.web.tomcat.Tomcat7' then
+		true
+	else
+		false
+	endif;
+
+helper def: isParentType(type: String): Boolean = 
+	if type = 'tosca.nodes.LoadBalancer' or type = 'kr.ac.hanyang.oCamp.entities.services.web.WebAppCluster' then  
+		true
+	else
+		false
+	endif;
+
+helper def: convertNodeType(nodeType: String): String = 
+	--if node = 'tosca.nodes.Root' then ' 
+	--if node = 'tosca.nodes.Compute'
+	if nodeType = 'tosca.nodes.SoftwareComponent' then 'kr.ac.hanyang.oCamp.entities.artifacts.Software' else 
+	if nodeType = 'tosca.nodes.WebServer' then 'kr.ac.hanyang.oCamp.entities.services.web.tomcat.Tomcat7' else
+	if nodeType = 'tosca.nodes.WebApplication' then 'kr.ac.hanyang.oCamp.entities.artifacts.War' else
+	if nodeType = 'tosca.nodes.DBMS' then 'kr.ac.hanyang.oCamp.entities.services.database.mysql.MySQL'else
+	if nodeType = 'tosca.nodes.Database' then 'kr.ac.hanyang.oCamp.entities.artifacts.Script' else
+	if nodeType = 'tosca.nodes.LoadBalancer' then 'kr.ac.hanyang.oCamp.entities.services.web.WebAppCluster' else
+		nodeType
+	endif endif endif endif endif endif;
+
+helper def: convertProp(prop: String): String = 
+	if prop = 'component_version' then 'VERSION' else 
+	if prop = 'context_root' then 'TARGET' else
+	if prop = 'root_password' then 'MYSQL_PASSWORD' else
+	if prop = 'port' then 'MYSQL_PORT'else
+		prop
+	endif endif endif endif;
+
+	
+helper context MMTOSCA!ServiceTemplateModel def: getAncestor(typeName: String): String = 
+	let temp: MMTOSCA!NodeTemplateModel = self.getNodeTemplate(typeName) in
+		let tempDef: MMTOSCA!NodeDefinitionModel = self.getNodeDefinition(temp.type) in
+			tempDef.derivedFrom;
+				
+
+-- determines if a node is an artifact type or service type
+helper context MMTOSCA!ServiceTemplateModel def: isArtifact(node: MMTOSCA!NodeTemplateModel): Boolean = 
+	if (thisModule.isNormativeNode(node.type)) then
+		if node.type = 'tosca.nodes.WebApplication'
+		or node.type = 'tosca.nodes.Database' 
+		or node.type = 'tosca.nodes.Container.Application' then 
+			true 
+		else
+			false
+		endif
+	else let temp: String = self.getNodeDefinition(node.type).derivedFrom in 
+	if (thisModule.isNormativeNode(temp)) then
+			if temp = 'tosca.nodes.WebApplication'
+			or temp = 'tosca.nodes.Database' 
+			or temp = 'tosca.nodes.Container.Application' then 
+				true 
+			else
+				false
+		 	endif
+		else
+				false
+		endif	
+		 
+	endif;
+	
+
+helper context MMTOSCA!ServiceTemplateModel def: collectArtifacts(): Sequence(MMTOSCA!NodeTemplateModel) =
+	self.topologyTemplate.nodeTemplates -> select(e | self.isArtifact(e));
+
+helper context MMTOSCA!ServiceTemplateModel def: collectServices(): Sequence(MMTOSCA!NodeTemplateModel) =
+	self.topologyTemplate.nodeTemplates -> select(e | not self.isArtifact(e));
+
+helper context MMTOSCA!NodeTemplateModel def: collectAttributes(): Sequence(MMTOSCA!PropertyModel) = 
+	self.properties -> select(e | true);
+
+helper context MMTOSCA!ServiceTemplateModel def: getMember(n:MMTOSCA!NodeTemplateModel): MMTOSCA!NodeTemplate = 
+		let app: String = n.requirements -> collect(e | e.node) -> first() in
+			let artif: MMTOSCA!NodeTemplateModel = self.topologyTemplate.nodeTemplates -> select(e | e.name = app) -> first() in
+				let member: MMTOSCA!NodeTemplateModel = self.topologyTemplate.nodeTemplates -> select(e | e.name = artif.requirements -> collect(f | f.node) -> first()) -> first() in
+					member;	
+	
+helper context MMTOSCA!ServiceTemplateModel def: getFulfillment(node:String): MMTOSCA!NodeTemplate = 
+		let member: MMTOSCA!NodeTemplateModel = self.topologyTemplate.nodeTemplates -> select(e | e.name = node) -> first() in
+			member;				
+			
+helper context MMTOSCA!PolicyDefinitionModel def: collectConstraints(): Sequence(MMTOSCA!PropertyModel) = 
+	self.properties -> select(e | true);
+
+helper context MMTOSCA!NodeTemplateModel def: collectRequirements(): Sequence(MMTOSCA!RequirementAssignmentModel) = 
+	self.requirements -> select(e| true);
+
+helper context MMTOSCA!ServiceTemplateModel def: collectPolicies(): Sequence(MMTOSCA!PolicyDefinitionModel) = 
+	self.topologyTemplate.policies -> select(e| true);
+
+helper context MMTOSCA!NodeTemplateModel def: getArtifactContent(): String = 
+	let nodeArtifact:MMTOSCA!ArtifactDefinitionModel = 
+		self.artifacts -> select(e | true) -> first() in
+		if (nodeArtifact = OclUndefined) then
+			let interface:MMTOSCA!InterfaceDefinitionModel = 
+				(self.interfaces -> select(i | i.name = 'Standard') -> first()) in
+					let operation:MMTOSCA!OperationDefinitionModel = 
+						let createOp:MMTOSCA!OperationDefinitionModel = 
+							interface.operations -> select(e | e.name = 'create') -> first() in
+						if (createOp = OclUndefined) then
+							interface.operations -> select(e | e.name = 'configure') -> first()
+						else
+							createOp
+						endif in
+					operation.implementation 
+		else
+			nodeArtifact.file
+		endif;
+
+helper def: fulfillments(artifacts: Sequence(MMCAMP!Artifact)): Sequence(MMCAMP!Service) = 
+	let services: MMCAMP!Service = artifacts -> collect(e |  e.requirements -> collect(f | f.fulfillment) ) in
+		services -> flatten();	
+	
+helper def: consolidate(services: Sequence(MMCAMP!Service)): Sequence(MMCAMP!Service) = 
+	let parents: Sequence(MMCAMP!Service) = services -> reject(e | thisModule.isParentType(e.characteristics.first().characteristicType)) in
+		--let children: MMCAMP!Services = parents -> collect(e | e.serviceCharacteristics -> first().member) in 
+			--children -> flatten();
+		parents;
+	
+	
+rule s_template2d_plan {
+	from
+		s: MMTOSCA!ServiceTemplateModel
+		
+	using{
+		servs: Sequence(MMCAMP!Service) = thisModule.consolidate(s.collectServices() -> collect(e | thisModule.n2srv(s,e)));
+	}
+	to
+		dPlan: MMCAMP!DeploymentPlan (
+			name <- 'DeploymentPlan',
+			description <- s.description,
+			--artifacts <- Sequence{s.collectArtifacts() -> collect(e | thisModule.n2art(s,e))}
+			--services <- servs--thisModule.consolidate(s.collectServices() -> collect(e | thisModule.n2srv(s,e))) -- -> reject(f | f -> reject(g | thisModule.fulfillments(dPlan.artifacts) -> includes(g))),
+			--policies <- Sequence{s.collectPolicies() -> collect(e | thisModule.p2pol(e))}
+			--actionGroups
+		)
+	do{
+		
+	}
+}	
+		
+lazy rule n2art{
+	from
+		s: MMTOSCA!ServiceTemplateModel,
+		n: MMTOSCA!NodeTemplateModel
+	to
+		art: MMCAMP!Artifact(
+			artifactType <- n.type,
+			content <- artCont, 
+			requirements <- Sequence{n.collectRequirements() -> collect(e | thisModule.req2campReq(s,e))}
+		),
+		artCont: MMCAMP!ArtifactContent(
+			-- need a helper to form the href using file and repository
+			href <- n.getArtifactContent()
+		)
+}
+
+lazy rule n2srv {
+	from
+		s: MMTOSCA!ServiceTemplateModel,
+		n: MMTOSCA!NodeTemplateModel	
+	using {
+			member: MMCAMP!Service = 
+				if thisModule.isParentType(n.type) then
+					thisModule.n2srv(s, s.getMember(n))
+				else
+					OclUndefined
+				endif;
+		}
+	to
+		srv: MMCAMP!Service (
+				name <- n.name,
+				characteristics <- src
+		),
+		src: MMCAMP!ServiceCharacteristic (
+			characteristicType <- thisModule.convertNodeType(n.type), --if it is a group them get the member and add the custom attr
+			customAttributes <- n.collectAttributes() -> collect(e | thisModule.prop2attr(e)),
+			member <- member
+		)
+}	
+
+lazy rule p2pol {
+	from
+		p:MMTOSCA!PolicyDefinitionModel
+	to
+		pol:MMCAMP!Policy(
+			policyType <- p.type,
+			policyConstraints <- Sequence{p.collectConstraints() -> collect(e | thisModule.prop2constr(e))},
+			targets <- p.targets
+		)
+}
+
+lazy rule prop2attr {
+	from
+		p: MMTOSCA!PropertyModel
+	to
+		scr: MMCAMP!StringToEObjectMap(
+			key <- thisModule.convertProp(p.name),
+			value <- p.value.value
+		)
+}
+
+lazy rule prop2constr {
+	from
+		p: MMTOSCA!PropertyModel
+	to
+		constr: MMCAMP!PolicyConstraint(
+			policyConstraintType <- p.name,
+			value <- 'value'
+		)
+}
+
+lazy rule req2campReq {
+	from 
+		s: MMTOSCA!ServiceTemplateModel,
+		req: MMTOSCA!RequirementAssignmentModel
+	to
+		campReq: MMCAMP!ArtifactRequirement(
+			requirementType <- req.relationship,
+			--customAttributes <-
+			fulfillment <- thisModule.n2srv(s, s.getFulfillment(req.node))
+		)		
+}
+
+
