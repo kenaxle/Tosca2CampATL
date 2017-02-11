@@ -44,7 +44,7 @@ helper def: isParentType(type: String): Boolean =
 	endif;
 
 helper def: isChildType(type: String): Boolean = 
-	if type = 'tosca.nodes.WebServer' or type = 'kr.ac.hanyang.oCamp.entities.services.web.tomcat.Tomcat7' then
+	if type = 'tosca.nodes.WebServer' or type = 'kr.ac.hanyang.oCamp.entities.services.software.VanillaSoftware' then
 		true
 	else
 		false
@@ -60,11 +60,11 @@ helper def: convertNodeType(nodeType: String): String =
 	--if node = 'tosca.nodes.Root' then ' 
 	--if node = 'tosca.nodes.Compute'
 	if nodeType = 'tosca.nodes.SoftwareComponent' then 'kr.ac.hanyang.oCamp.entities.artifacts.Software' else 
-	if nodeType = 'tosca.nodes.WebServer' then 'kr.ac.hanyang.oCamp.entities.services.web.tomcat.Tomcat7' else
-	if nodeType = 'tosca.nodes.WebApplication' then 'kr.ac.hanyang.oCamp.entities.artifacts.War' else
+	if nodeType = 'tosca.nodes.WebServer' then 'kr.ac.hanyang.oCamp.entities.services.software.VanillaSoftware' else
+	if nodeType = 'tosca.nodes.WebApplication' then 'kr.ac.hanyang.oCamp.entities.artifacts.Script' else
 	if nodeType = 'tosca.nodes.DBMS' then 'kr.ac.hanyang.oCamp.entities.services.database.mysql.MySQL'else
 	if nodeType = 'tosca.nodes.Database' then 'kr.ac.hanyang.oCamp.entities.artifacts.Script' else
-	if nodeType = 'tosca.nodes.LoadBalancer' then 'kr.ac.hanyang.oCamp.entities.services.web.WebAppCluster' else
+	if nodeType = 'tosca.nodes.LoadBalancer' then 'kr.ac.hanyang.oCamp.entities.services.DynamicCluster' else
 		nodeType
 	endif endif endif endif endif endif;
 
@@ -202,7 +202,7 @@ rule s_template2d_plan {
 	from
 		s: MMTOSCA!ServiceTemplateModel
 	to
-		dPlan: MMCAMP!DeploymentPlan (
+		dPlan: MMCAMP!DeploymentPlanModel (
 			name <- 'DeploymentPlan',
 			description <- s.description,
 			artifacts <- s.collectArtifacts() -> collect(e | thisModule.n2art(s,e)),
@@ -220,12 +220,12 @@ lazy rule n2art{
 		s: MMTOSCA!ServiceTemplateModel,
 		n: MMTOSCA!NodeTemplateModel
 	to
-		art: MMCAMP!Artifact(
+		art: MMCAMP!ArtifactModel(
 			artifactType <- thisModule.convertNodeType(s.getRealTypeName(n.type)),
 			content <- artCont, 
 			requirements <- n.requirements -> collect(e | thisModule.req2campReq(s,n,e))
 		),
-		artCont: MMCAMP!ArtifactContent(
+		artCont: MMCAMP!ArtifactContentModel(
 			-- need a helper to form the href using file and repository
 			href <- n.getArtifactContent()
 		)
@@ -236,7 +236,7 @@ lazy rule n2srv {
 		s: MMTOSCA!ServiceTemplateModel,
 		n: MMTOSCA!NodeTemplateModel
 	using {
-			member: MMCAMP!Service = 
+			member: MMCAMP!ServiceModel = 
 				if thisModule.isParentType(n.type) then
 					thisModule.n2srv(s, s.getMember(n))
 				else
@@ -244,12 +244,12 @@ lazy rule n2srv {
 				endif;
 		}
 	to
-		srv: MMCAMP!Service (
+		srv: MMCAMP!ServiceModel (
 				name <- n.name,
 				characteristics <- src
 		),
-		src: MMCAMP!ServiceCharacteristic (
-			characteristicType <- thisModule.convertNodeType(n.type), --if it is a group them get the member and add the custom attr
+		src: MMCAMP!ServiceCharacteristicModel (
+			characteristicType <- thisModule.convertNodeType(s.getRealTypeName(n.type)), --if it is a group them get the member and add the custom attr
 			customAttributes <- n.collectAttributes() -> collect(e | thisModule.prop2attr(e)),
 			member <- member
 		)
@@ -259,7 +259,7 @@ lazy rule p2pol {
 	from
 		p:MMTOSCA!PolicyDefinitionModel
 	to
-		pol:MMCAMP!Policy(
+		pol:MMCAMP!PolicyModel(
 			policyType <- p.type,
 			policyConstraints <- Sequence{p.collectConstraints() -> collect(e | thisModule.prop2constr(e))},
 			targets <- p.targets
@@ -280,7 +280,7 @@ lazy rule prop2constr {
 	from
 		p: MMTOSCA!PropertyModel
 	to
-		constr: MMCAMP!PolicyConstraint(
+		constr: MMCAMP!PolicyConstraintModel(
 			policyConstraintType <- p.name,
 			value <- p.value.value
 		)
@@ -292,7 +292,7 @@ lazy rule req2campReq {
 		n: MMTOSCA!NodeTemplateModel,
 		req: MMTOSCA!RequirementAssignmentModel
 	to
-		campReq: MMCAMP!ArtifactRequirement(
+		campReq: MMCAMP!ArtifactRequirementModel(
 			requirementType <- thisModule.convertRelType(req.relationship),
 			customAttributes <- n.properties -> collect(e | thisModule.prop2attr(e)),
 			fulfillment <- s.getFulfillment(req.node)

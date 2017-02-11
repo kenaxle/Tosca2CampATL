@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<kr.ac.hanyang.oCamp.camp.pdp:DeploymentPlan xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:kr.ac.hanyang.oCamp.camp.pdp="http:///kr/ac/hanyang/oCamp/camp/pdp.ecore" name="DeploymentPlan" description="TOSCA simple profile is an attempt at a microservice definition.&#xA;    &#xA;">
-  <artifacts artifactType="kr.ac.hanyang.oCamp.entities.artifacts.War">
+<kr.ac.hanyang.oCamp.camp.pdp:DeploymentPlanModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:kr.ac.hanyang.oCamp.camp.pdp="http:///kr/ac/hanyang/oCamp/camp/pdp.ecore" name="DeploymentPlan" description="TOSCA simple profile is an attempt at a microservice definition.&#xA;    &#xA;">
+  <artifacts artifactType="kr.ac.hanyang.oCamp.entities.artifacts.Script">
     <content href="wordpress_install.sh"/>
     <requirements requirementType="kr.ac.hanyang.oCamp.entities.requirements.DeployOn" fulfillment="id: loadbalancer">
       <customAttributes key="TARGET" value="ACED000574000E6D795F7765625F636F6E74656E74"/>
@@ -19,10 +19,10 @@
     </requirements>
   </artifacts>
   <services name="loadbalancer">
-    <characteristics characteristicType="kr.ac.hanyang.oCamp.entities.services.web.WebAppCluster">
+    <characteristics characteristicType="kr.ac.hanyang.oCamp.entities.services.DynamicCluster">
       <customAttributes key="algorithm" value="ACED000574000A726F756E64726F62696E"/>
       <member name="webserver">
-        <characteristics characteristicType="My_scalable_webserver">
+        <characteristics characteristicType="kr.ac.hanyang.oCamp.entities.services.software.VanillaSoftware">
           <customAttributes key="min_instances" value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000002"/>
           <customAttributes key="max_instances" value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000005"/>
         </characteristics>
@@ -48,4 +48,4 @@
     <policyConstraints policyConstraintType="location" value="ACED00057400197261636B73706163652D636C6F7564736572766572732D756B"/>
     <targets>mysql_dbms</targets>
   </policies>
-</kr.ac.hanyang.oCamp.camp.pdp:DeploymentPlan>
+</kr.ac.hanyang.oCamp.camp.pdp:DeploymentPlanModel>
